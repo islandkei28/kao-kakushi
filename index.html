@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; img-src 'self' blob:; style-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'self'">
+<meta name="theme-color" content="#1d1f21">
+<title>顔かくし</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <button id="open" class="primary">写真を開く</button>
+  <input id="file" type="file" accept="image/*" multiple hidden>
+  <span class="grow"></span>
+  <button id="undo" disabled>元に戻す</button>
+  <button id="save" class="primary" disabled>保存へ</button>
+</header>
+
+<main>
+  <section id="stage">
+    <canvas id="view"></canvas>
+    <div id="empty">
+      <p class="big">写真を選ぶと、顔を探して隠します</p>
+      <p>写真は端末の中だけで処理し、どこにも送りません。</p>
+      <button id="open2" class="primary">写真を開く</button>
+    </div>
+    <div id="status" role="status" hidden></div>
+    <div id="itembar" hidden>
+      <button id="toggle">隠さない</button>
+      <button id="remove">消す</button>
+    </div>
+  </section>
+
+  <aside id="panel" hidden>
+    <div id="thumbs"></div>
+    <div class="tabs" role="tablist">
+      <button data-tab="hide" class="on" role="tab">隠す</button>
+      <button data-tab="crop" role="tab">切り抜く</button>
+    </div>
+
+    <div data-pane="hide">
+      <div class="seg" id="tools">
+        <button data-tool="select" class="on">選ぶ</button>
+        <button data-tool="box">囲んで隠す</button>
+        <button data-tool="brush">なぞって隠す</button>
+      </div>
+      <label class="row" id="brushrow" hidden><span>太さ</span><input id="brush" type="range" min="1" max="20" value="6"></label>
+
+      <p id="target"></p>
+      <div class="seg" id="modes">
+        <button data-mode="mosaic">モザイク</button>
+        <button data-mode="blur">ぼかし</button>
+        <button data-mode="stamp">スタンプ</button>
+        <button data-mode="fill">塗りつぶし</button>
+      </div>
+      <label class="row" data-for="mosaic blur"><span>強さ</span><input id="strength" type="range" min="1" max="5" step="1"></label>
+      <p class="note" id="weak" hidden>弱いと、だれか分かってしまうことがあります</p>
+      <div data-for="stamp">
+        <div id="stamps"></div>
+        <div class="row">
+          <input id="emoji" type="text" maxlength="12" placeholder="好きな絵文字" aria-label="好きな絵文字">
+          <button id="stampimg">画像を使う</button>
+          <input id="stampfile" type="file" accept="image/*" hidden>
+        </div>
+        <label class="row check"><input id="under" type="checkbox"><span>スタンプの下もぼかす（すき間から見えないように）</span></label>
+      </div>
+      <label class="row" data-for="fill"><span>色</span><input id="color" type="color"></label>
+      <label class="row"><span>顔の範囲</span><input id="pad" type="range" min="1" max="2.2" step="0.05"></label>
+      <div class="seg" id="shapes">
+        <button data-shape="ellipse">丸</button>
+        <button data-shape="rect">四角</button>
+      </div>
+      <button id="thorough">横向き・逆さの顔も探す</button>
+      <button id="drop">この写真を外す</button>
+      <p class="note" id="meta"></p>
+    </div>
+
+    <div data-pane="crop" hidden>
+      <div id="ratios" class="wrap"></div>
+      <label class="row check" id="padrow"><input id="croppad" type="checkbox"><span>切らずに余白をつける</span></label>
+      <label class="row" id="bgrow"><span>余白の色</span><input id="bg" type="color" value="#ffffff"></label>
+      <label class="row"><span>横幅</span>
+        <select id="limit"><option value="1080">1080px（Instagram）</option><option value="2048">2048px</option><option value="0">元のまま</option></select>
+      </label>
+    </div>
+  </aside>
+</main>
+
+<dialog id="dlg">
+  <p id="dlgmsg"></p>
+  <div id="results"></div>
+  <div class="row end">
+    <button id="dlgclose">戻る</button>
+    <button id="share" class="primary" hidden>共有・写真に保存</button>
+    <button id="download" class="primary">ファイルに保存</button>
+  </div>
+</dialog>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
